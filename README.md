@@ -1,4 +1,4 @@
-# mct-sougou-annai
+# m-city-sougou-annai
 
 M-CITY総合案内サイトの独立リポジトリです。
 
