@@ -193,22 +193,13 @@
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(90% 44% at 50% 30%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 66%),
+                radial-gradient(90% 44% at 50% 30%, var(--sky-glow, rgba(255,255,255,.55)) 0%, rgba(255,255,255,0) 66%),
                 linear-gradient(180deg,
-                    #9CC9F2 0%,
-                    #B4D8F7 16%,
-                    #CDE5FA 34%,
-                    #E2EFFB 52%,
-                    #F0F5FC 70%,
-                    #F8FAFD 84%,
-                    var(--page) 96%);
-        }
-        .city__warm {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(255,241,225,.85) 0%, rgba(255,246,236,.35) 48%, rgba(255,255,255,0) 76%);
-            opacity: calc(var(--t) * .9);
-            transition: opacity .4s linear;
+                    var(--sky-a, #9CC9F2) 0%,
+                    var(--sky-b, #CDE5FA) 34%,
+                    var(--sky-c, #E9F1FB) 62%,
+                    var(--sky-d, #F8FAFD) 84%,
+                    var(--page) 97%);
         }
         .city-canvas {
             position: absolute;
@@ -222,13 +213,17 @@
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(44% 32% at 50% 33%, rgba(255,255,255,.88), rgba(255,255,255,0) 78%);
+                radial-gradient(48% 36% at 50% 32%, var(--veil-color, rgba(255,255,255,.88)) 0%, rgba(255,255,255,0) 78%);
         }
         .city__fade {
             position: absolute;
             left: 0; right: 0; bottom: 0;
             height: 40vh;
-            background: linear-gradient(180deg, rgba(250,250,251,0) 0%, rgba(250,250,251,.22) 58%, rgba(250,250,251,.85) 88%, var(--page) 100%);
+            background: linear-gradient(180deg,
+                rgba(250,250,251,0) 0%,
+                var(--fade-mid, rgba(250,250,251,.22)) 58%,
+                rgba(250,250,251,.86) 88%,
+                var(--page) 100%);
         }
         .city__grain {
             position: absolute;
@@ -241,9 +236,9 @@
         /* 本文帯は紙面として不透明に */
         .sheet {
             position: relative;
-            background: rgba(250,250,251,.88);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
+            background: rgba(251,251,253,.78);
+            backdrop-filter: blur(1.5px);
+            -webkit-backdrop-filter: blur(1.5px);
         }
         .sheet::before {
             content: '';
@@ -765,7 +760,9 @@
             border-bottom: 1px solid var(--line);
         }
         .sec-mist {
-            background: linear-gradient(180deg, #F2F5FA 0%, #EFF3F9 100%);
+            background: linear-gradient(180deg, rgba(242,245,250,.86) 0%, rgba(239,243,249,.86) 100%);
+            backdrop-filter: blur(1.5px);
+            -webkit-backdrop-filter: blur(1.5px);
             border-top: 1px solid rgba(16,24,40,.05);
             border-bottom: 1px solid rgba(16,24,40,.05);
         }
@@ -886,6 +883,63 @@
             .cta-orbit::before { animation: none; }
         }
 
+
+        /* ============================================================
+           時間帯サイクル（昼 → 夕 → 夜 → 夜明け）
+           ============================================================ */
+        #entry h1 {
+            color: var(--hero-ink, #323B4D);
+            text-shadow: var(--hero-shadow, none);
+            transition: color .6s linear, text-shadow .6s linear;
+        }
+        #entry .lede {
+            color: var(--hero-ink-2, #333333);
+            text-shadow: var(--hero-shadow, none);
+            transition: color .6s linear, text-shadow .6s linear;
+        }
+        .city__sky, .city__veil, .city__fade {
+            transition: background .8s linear;
+        }
+
+        /* ============================================================
+           夜の街（固定）
+           ============================================================ */
+        :root {
+            --sky-a: #060D22;
+            --sky-b: #0C1836;
+            --sky-c: #142650;
+            --sky-d: #1F3462;
+            --sky-glow: rgba(120,180,255,.16);
+            --veil-color: rgba(5,12,30,.58);
+            --fade-mid: rgba(17,30,60,.5);
+            --hero-ink: #FFFFFF;
+            --hero-ink-2: #D9E4F6;
+            --hero-shadow: 0 2px 12px rgba(2,8,24,.9), 0 0 34px rgba(6,16,44,.65);
+        }
+        .city__sky {
+            background:
+                radial-gradient(80% 46% at 50% 26%, var(--sky-glow) 0%, rgba(120,180,255,0) 68%),
+                linear-gradient(180deg,
+                    var(--sky-a) 0%,
+                    var(--sky-b) 30%,
+                    var(--sky-c) 56%,
+                    var(--sky-d) 76%,
+                    #2C4372 88%,
+                    var(--page) 99%) !important;
+        }
+        /* 夜空から白い紙面へのつなぎ */
+        .city__fade {
+            background: linear-gradient(180deg,
+                rgba(20,36,72,0) 0%,
+                var(--fade-mid) 46%,
+                rgba(150,170,205,.72) 78%,
+                rgba(240,242,248,.95) 92%,
+                var(--page) 100%) !important;
+        }
+        /* 夜は粒子ノイズを弱める */
+        .city__grain { opacity: .022; mix-blend-mode: screen; }
+        /* ヘッダーは夜空の上でも沈まないよう、わずかに濃く */
+        #main-header { background: rgba(255,255,255,.9); }
     </style>
 </head>
 <body class="antialiased">
@@ -1638,10 +1692,30 @@
             let SPEED = 0.42;           // 前進速度 px/ms
 
             let buildings = [];
+            let stars = [];
             let lastT = 0, travelled = 0, boost = 0, lastScroll = 0;
             let mouseX = 0, targetMouseX = 0;
 
             function rand(a, b) { return a + Math.random() * (b - a); }
+
+            function buildStars() {
+                stars = [];
+                const n = window.innerWidth < 768 ? 90 : 170;
+                for (let i = 0; i < n; i++) {
+                    const y = Math.pow(Math.random(), 1.7);         // 上空ほど密に
+                    const big = Math.random();
+                    stars.push({
+                        x: Math.random(),
+                        y: y * 0.62,
+                        r: big > .965 ? rand(1.5, 2.1) : (big > .82 ? rand(.9, 1.4) : rand(.45, .85)),
+                        base: big > .965 ? rand(.85, 1) : rand(.35, .85),
+                        sp: rand(.6, 2.6),                          // 瞬きの速さ
+                        ph: Math.random() * Math.PI * 2,
+                        sp2: rand(.2, .9),                          // ゆっくりした揺らぎ
+                        tint: big > .93 ? '#CFE0FF' : (big > .86 ? '#FFF3D6' : '#FFFFFF')
+                    });
+                }
+            }
 
             function buildCity() {
                 buildings = [];
@@ -1679,6 +1753,7 @@
                 canvas.style.height = H + 'px';
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                 buildCity();
+                buildStars();
             }
 
             /* カメラ：直進せず、ビルの谷間を縫うように蛇行する */
@@ -1736,8 +1811,47 @@
                 ctx.rotate(cam.roll);
                 ctx.translate(-W / 2, -H * .46);
 
+                const tint = window.CITY_TINT || { line:[27,74,128], lineA:1, glow:0, star:0, lit:.4 };
+                const L = tint.line, LA = tint.lineA;
+                const rgba = (al) => 'rgba(' + L[0] + ',' + L[1] + ',' + L[2] + ',' + Math.min(1, al * LA).toFixed(3) + ')';
+
+                /* --- 星：それぞれ違う速さでちらつく --- */
+                if (tint.star > 0.02) {
+                    const now = travelled * 0.004;
+                    for (let i = 0; i < stars.length; i++) {
+                        const st = stars[i];
+                        const flick = 0.55 + 0.45 * Math.sin(now * st.sp + st.ph)
+                                           + 0.22 * Math.sin(now * st.sp2 * 2.7 + st.ph * 1.7);
+                        const a = Math.max(0, Math.min(1, st.base * flick)) * tint.star;
+                        if (a < 0.02) continue;
+                        const px = st.x * W, py = st.y * H;
+                        ctx.globalAlpha = a;
+                        ctx.fillStyle = st.tint;
+                        ctx.beginPath();
+                        ctx.arc(px, py, st.r, 0, 6.283);
+                        ctx.fill();
+                        /* 明るい星はにじみと十字の光条 */
+                        if (st.r > 1.35) {
+                            ctx.globalAlpha = a * .5;
+                            ctx.beginPath();
+                            ctx.arc(px, py, st.r * 2.6, 0, 6.283);
+                            ctx.fillStyle = 'rgba(180,215,255,' + (a * .28).toFixed(3) + ')';
+                            ctx.fill();
+                            ctx.globalAlpha = a * .55;
+                            ctx.strokeStyle = st.tint;
+                            ctx.lineWidth = .7;
+                            const ray = st.r * 4.2;
+                            ctx.beginPath();
+                            ctx.moveTo(px - ray, py); ctx.lineTo(px + ray, py);
+                            ctx.moveTo(px, py - ray); ctx.lineTo(px, py + ray);
+                            ctx.stroke();
+                        }
+                    }
+                    ctx.globalAlpha = 1;
+                }
+
                 /* --- 地面グリッド --- */
-                ctx.strokeStyle = '#2A6DB0';
+                ctx.strokeStyle = rgba(1);
                 const gridSpan = 2100;
                 const step = 300;
                 const offset = travelled % step;
@@ -1747,7 +1861,7 @@
                     if (zz < NEAR) continue;
                     const a = project(-gridSpan, 0, zz);
                     const b = project(gridSpan, 0, zz);
-                    line(a, b, fog(zz) * .24, 1);
+                    line(a, b, fog(zz) * .24 * LA, 1);
                 }
                 for (let x = -gridSpan; x <= gridSpan; x += step) {
                     const a = project(x, 0, NEAR);
@@ -1756,8 +1870,8 @@
                     ctx.lineWidth = 1;
                     if (a && b) {
                         const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-                        grad.addColorStop(0, 'rgba(42,109,176,.22)');
-                        grad.addColorStop(1, 'rgba(42,109,176,0)');
+                        grad.addColorStop(0, rgba(.22));
+                        grad.addColorStop(1, 'rgba(' + L[0] + ',' + L[1] + ',' + L[2] + ',0)');
                         ctx.strokeStyle = grad;
                         ctx.beginPath();
                         ctx.moveTo(a.x, a.y);
@@ -1767,7 +1881,9 @@
                 }
 
                 /* --- ビル --- */
-                ctx.strokeStyle = '#1B4A80';
+                ctx.strokeStyle = rgba(1);
+                ctx.shadowBlur = tint.glow * 9;
+                ctx.shadowColor = 'rgba(' + L[0] + ',' + L[1] + ',' + L[2] + ',' + (tint.glow * .8).toFixed(2) + ')';
                 buildings.forEach(b => {
                     const z0 = b.z - travelled % (FAR - NEAR);
                     let z = z0;
@@ -1790,8 +1906,8 @@
                     if (p.some(v => !v)) return;
 
                     /* 屋根面をごく淡く塗る（CG感の芯） */
-                    ctx.globalAlpha = f * .07;
-                    ctx.fillStyle = '#2A6DB0';
+                    ctx.globalAlpha = f * (.07 + tint.glow * .05);
+                    ctx.fillStyle = rgba(1);
                     ctx.beginPath();
                     ctx.moveTo(p[2].x, p[2].y);
                     ctx.lineTo(p[3].x, p[3].y);
@@ -1800,7 +1916,7 @@
                     ctx.closePath();
                     ctx.fill();
 
-                    const a = f * .7, lw = Math.max(.7, f * 1.45);
+                    const a = f * .7 * LA, lw = Math.max(.7, f * 1.45);
                     /* 垂直エッジ */
                     line(p[0], p[2], a, lw);
                     line(p[1], p[3], a, lw);
@@ -1823,11 +1939,11 @@
                     }
 
                     /* 灯り */
-                    if (b.lit) {
+                    if (b.lit && tint.lit > .05) {
                         const y = b.h * (.35 + b.hue * .4);
                         const q = project(b.x, y, zA);
                         if (q) {
-                            ctx.globalAlpha = f * .5;
+                            ctx.globalAlpha = f * (.35 + tint.lit * .75);
                             ctx.fillStyle = b.hue > .6 ? '#EF7C22' : (b.hue > .3 ? '#2A6DB0' : '#4E9A3E');
                             const r = Math.max(1, q.s * 2.4);
                             ctx.fillRect(q.x - r / 2, q.y - r / 2, r, r);
@@ -1836,6 +1952,7 @@
                 });
 
                 ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
                 ctx.restore();
             }
 
@@ -1898,6 +2015,10 @@
 
 
 
+
+
+        /* 夜の街に固定 */
+        window.CITY_TINT = { line: [128, 206, 255], lineA: 1.55, glow: 1, star: 1, lit: 1 };
 
     </script>
 </body>
